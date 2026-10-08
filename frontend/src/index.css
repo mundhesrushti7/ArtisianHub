@@ -1509,3 +1509,548 @@ nav a:hover {
     flex-direction: column;
   }
 }
+
+/* ================= ORDERS PAGE ================= */
+
+.orders-page {
+  min-height: calc(100vh - 70px);
+  background-color: #f8f5f0;
+  padding-bottom: 80px;
+}
+
+.orders-header {
+  text-align: center;
+  padding: 60px 20px 45px;
+  background-color: #eee7dd;
+}
+
+.orders-header p {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #8b4a2f;
+  margin-bottom: 10px;
+}
+
+.orders-header h1 {
+  font-size: 42px;
+  margin-bottom: 12px;
+}
+
+.orders-header span {
+  color: #666;
+}
+
+.orders-container {
+  max-width: 1100px;
+  margin: 45px auto;
+  padding: 0 25px;
+}
+
+/* ================= ORDER CARD ================= */
+
+.order-card {
+  background-color: white;
+  margin-bottom: 25px;
+}
+
+.order-card-header {
+  padding: 22px 25px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+
+  border-bottom: 1px solid #e5e0d9;
+}
+
+.order-card-header div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.order-card-header span,
+.order-card-footer span {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #777;
+}
+
+.order-card-header strong {
+  font-size: 14px;
+}
+
+/* ================= ORDER STATUS ================= */
+
+.status-active {
+  color: #8b4a2f;
+}
+
+.status-delivered {
+  color: #287a45;
+}
+
+.status-cancelled {
+  color: #b33;
+}
+
+/* ================= ORDER ITEMS ================= */
+
+.order-items {
+  padding: 10px 25px;
+}
+
+.order-item {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+
+  gap: 18px;
+
+  align-items: center;
+
+  padding: 18px 0;
+
+  border-bottom: 1px solid #eee;
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.order-item-image {
+  width: 80px;
+  height: 80px;
+
+  background-color: #eee7dd;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #8b4a2f;
+
+  font-size: 12px;
+  text-align: center;
+}
+
+.order-item-info h3 {
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+.order-item-info p {
+  color: #777;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.order-item-info span {
+  font-size: 12px;
+  color: #777;
+}
+
+.order-item > strong {
+  font-size: 15px;
+}
+
+/* ================= ORDER FOOTER ================= */
+
+.order-card-footer {
+  background-color: #faf9f7;
+
+  padding: 20px 25px;
+
+  display: flex;
+  justify-content: flex-end;
+
+  gap: 60px;
+}
+
+.order-card-footer div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.order-card-footer strong {
+  font-size: 15px;
+}
+
+/* ================= EMPTY ORDERS ================= */
+
+.orders-empty {
+  text-align: center;
+
+  padding: 120px 20px;
+}
+
+.orders-empty h2 {
+  font-size: 30px;
+  margin-bottom: 12px;
+}
+
+.orders-empty p {
+  color: #666;
+  margin-bottom: 25px;
+}
+
+.orders-empty button {
+  padding: 13px 25px;
+
+  border: none;
+
+  background-color: #8b4a2f;
+  color: white;
+
+  cursor: pointer;
+}
+
+/* ================= NAVBAR LOGOUT ================= */
+
+.navbar-logout {
+  border: none;
+  background: transparent;
+
+  color: #8b4a2f;
+
+  cursor: pointer;
+
+  font-size: inherit;
+}
+
+/* ================= ORDERS RESPONSIVE ================= */
+
+@media (max-width: 700px) {
+  .order-card-header {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .order-item {
+    grid-template-columns: 65px 1fr;
+  }
+
+  .order-item-image {
+    width: 65px;
+    height: 65px;
+  }
+
+  .order-item > strong {
+    grid-column: 2;
+  }
+
+  .order-card-footer {
+    justify-content: space-between;
+    gap: 20px;
+  }
+}
+
+/* =========================================================
+   ARTISAN / SELLER DASHBOARD
+   ========================================================= */
+
+.artisan-dashboard {
+  min-height: calc(100vh - 80px);
+  padding: 40px 6%;
+  background: #f8f3ed;
+}
+
+/* Dashboard Header */
+
+.artisan-dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 35px;
+}
+
+.artisan-dashboard-label {
+  margin: 0 0 8px;
+  color: #9a6b43;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.artisan-dashboard-header h1 {
+  margin: 0 0 8px;
+  color: #3f2a1d;
+  font-size: 34px;
+}
+
+.artisan-dashboard-header p {
+  margin: 0;
+  color: #75685f;
+  font-size: 16px;
+}
+
+.artisan-add-product-btn {
+  border: none;
+  background: #7a4b2a;
+  color: white;
+  padding: 13px 22px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.artisan-add-product-btn:hover {
+  background: #5f381f;
+  transform: translateY(-1px);
+}
+
+/* Statistics */
+
+.artisan-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  margin-bottom: 30px;
+}
+
+.artisan-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: white;
+  border: 1px solid #eadfd4;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 3px 12px rgba(70, 45, 30, 0.06);
+}
+
+.artisan-stat-icon {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1e3d5;
+  border-radius: 10px;
+  font-size: 24px;
+  color: #7a4b2a;
+}
+
+.artisan-stat-card p {
+  margin: 0 0 5px;
+  color: #75685f;
+  font-size: 14px;
+}
+
+.artisan-stat-card h2 {
+  margin: 0;
+  color: #3f2a1d;
+  font-size: 26px;
+}
+
+/* Main Dashboard Content */
+
+.artisan-dashboard-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 25px;
+}
+
+.artisan-dashboard-card {
+  background: white;
+  border: 1px solid #eadfd4;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 3px 12px rgba(70, 45, 30, 0.06);
+}
+
+.artisan-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.artisan-card-header h2 {
+  margin: 0 0 5px;
+  color: #3f2a1d;
+  font-size: 21px;
+}
+
+.artisan-card-header p {
+  margin: 0;
+  color: #8a7c72;
+  font-size: 14px;
+}
+
+.artisan-card-header button {
+  border: none;
+  background: transparent;
+  color: #7a4b2a;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.artisan-card-header button:hover {
+  text-decoration: underline;
+}
+
+/* Recent Orders */
+
+.artisan-orders-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.artisan-order-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 20px;
+  padding: 17px 0;
+  border-bottom: 1px solid #eee5dd;
+}
+
+.artisan-order-row:last-child {
+  border-bottom: none;
+}
+
+.artisan-order-row h3 {
+  margin: 0 0 5px;
+  color: #463328;
+  font-size: 15px;
+}
+
+.artisan-order-row p {
+  margin: 0;
+  color: #8a7c72;
+  font-size: 13px;
+}
+
+.artisan-order-status {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 20px;
+  background: #f1e3d5;
+  color: #7a4b2a;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.artisan-order-total {
+  color: #3f2a1d;
+  font-weight: 700;
+}
+
+/* Empty State */
+
+.artisan-empty-state {
+  text-align: center;
+  padding: 35px 15px;
+  color: #8a7c72;
+}
+
+.artisan-empty-state div {
+  font-size: 38px;
+  margin-bottom: 10px;
+}
+
+.artisan-empty-state h3 {
+  margin: 0 0 6px;
+  color: #4a382d;
+}
+
+.artisan-empty-state p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Quick Actions */
+
+.artisan-quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.artisan-quick-actions button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  padding: 15px;
+  border: 1px solid #eadfd4;
+  border-radius: 9px;
+  background: #fffaf6;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.artisan-quick-actions button:hover {
+  background: #f6ebe0;
+  border-color: #d8c1ae;
+  transform: translateY(-1px);
+}
+
+.artisan-quick-actions button > span {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1e3d5;
+  border-radius: 8px;
+  font-size: 18px;
+}
+
+.artisan-quick-actions button div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.artisan-quick-actions strong {
+  color: #463328;
+  font-size: 14px;
+}
+
+.artisan-quick-actions small {
+  color: #8a7c72;
+  font-size: 12px;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .artisan-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .artisan-dashboard-content {
+    grid-template-columns: 1fr;
+  }
+
+  .artisan-dashboard-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
+  .artisan-dashboard {
+    padding: 25px 20px;
+  }
+
+  .artisan-dashboard-header h1 {
+    font-size: 28px;
+  }
+
+  .artisan-order-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .artisan-card-header {
+    align-items: flex-start;
+    gap: 15px;
+  }
+}

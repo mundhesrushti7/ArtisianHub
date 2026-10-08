@@ -8,45 +8,28 @@ import Login from "../pages/customer/Login";
 import Register from "../pages/customer/Register";
 import Checkout from "../pages/customer/Checkout";
 import OrderSuccess from "../pages/customer/OrderSuccess";
+import Orders from "../pages/customer/Orders";
+
+import ArtisanDashboard from "../pages/artisian/ArtisanDashboard";
 
 function AppRoutes() {
   return (
     <Routes>
+      {/* Customer Routes */}
       <Route path="/" element={<Home />} />
+      <Route path="/products" element={<Products />} />
+      <Route path="/product/:id" element={<ProductDetails />} />
+      <Route path="/cart" element={<Cart />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/checkout" element={<Checkout />} />
+      <Route path="/order-success" element={<OrderSuccess />} />
+      <Route path="/orders" element={<Orders />} />
 
+      {/* Artisan / Seller Routes */}
       <Route
-        path="/products"
-        element={<Products />}
-      />
-
-      <Route
-        path="/product/:id"
-        element={<ProductDetails />}
-      />
-
-      <Route
-        path="/cart"
-        element={<Cart />}
-      />
-
-      <Route
-        path="/login"
-        element={<Login />}
-      />
-
-      <Route
-        path="/register"
-        element={<Register />}
-      />
-
-      <Route
-        path="/checkout"
-        element={<Checkout />}
-      />
-
-      <Route
-        path="/order-success"
-        element={<OrderSuccess />}
+        path="/artisan/dashboard"
+        element={<ArtisanDashboard />}
       />
     </Routes>
   );

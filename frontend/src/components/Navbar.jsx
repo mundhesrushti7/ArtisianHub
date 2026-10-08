@@ -1,6 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Navbar() {
+  const navigate = useNavigate();
+
   const cart = JSON.parse(
     localStorage.getItem("artisanHubCart") || "[]"
   );
@@ -14,6 +16,14 @@ function Navbar() {
     localStorage.getItem("artisanHubCurrentUser") ||
       "null"
   );
+
+  const handleLogout = () => {
+    localStorage.removeItem(
+      "artisanHubCurrentUser"
+    );
+
+    navigate("/");
+  };
 
   return (
     <nav>
@@ -30,6 +40,7 @@ function Navbar() {
 
         <Link to="/cart">
           Cart
+
           {cartCount > 0 && (
             <span className="cart-badge">
               {cartCount}
@@ -38,9 +49,22 @@ function Navbar() {
         </Link>
 
         {currentUser ? (
-          <span className="navbar-user">
-            Hi, {currentUser.name}
-          </span>
+          <>
+            <Link to="/orders">
+              My Orders
+            </Link>
+
+            <span className="navbar-user">
+              Hi, {currentUser.name}
+            </span>
+
+            <button
+              className="navbar-logout"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </>
         ) : (
           <>
             <Link to="/login">
