@@ -13,9 +13,11 @@ function Navbar() {
   );
 
   const currentUser = JSON.parse(
-    localStorage.getItem("artisanHubCurrentUser") ||
-      "null"
+    localStorage.getItem("artisanHubCurrentUser") || "null"
   );
+
+  const isArtisan =
+    currentUser?.role === "artisan";
 
   const handleLogout = () => {
     localStorage.removeItem(
@@ -26,34 +28,57 @@ function Navbar() {
   };
 
   return (
-    <nav>
-      <h2>ArtisanHub</h2>
+    <nav className="navbar">
+      <Link
+        to="/"
+        className="navbar-brand"
+      >
+        ArtisanHub
+      </Link>
 
-      <div>
-        <Link to="/">
-          Home
-        </Link>
+      <div className="navbar-links">
+        <Link to="/">Home</Link>
 
         <Link to="/products">
           Products
         </Link>
 
-        <Link to="/cart">
-          Cart
+        {isArtisan ? (
+          <>
+            <Link to="/artisan/dashboard">
+              Dashboard
+            </Link>
 
-          {cartCount > 0 && (
-            <span className="cart-badge">
-              {cartCount}
-            </span>
-          )}
-        </Link>
+            <Link to="/artisan/products">
+              My Products
+            </Link>
+
+            <Link to="/artisan/orders">
+              Orders
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link to="/cart">
+              Cart
+
+              {cartCount > 0 && (
+                <span className="cart-badge">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+
+            {currentUser && (
+              <Link to="/orders">
+                My Orders
+              </Link>
+            )}
+          </>
+        )}
 
         {currentUser ? (
           <>
-            <Link to="/orders">
-              My Orders
-            </Link>
-
             <span className="navbar-user">
               Hi, {currentUser.name}
             </span>

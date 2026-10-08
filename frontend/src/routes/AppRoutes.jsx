@@ -14,6 +14,7 @@ import ArtisanDashboard from "../pages/artisian/ArtisanDashboard";
 import ArtisanProducts from "../pages/artisian/Products";
 import AddProduct from "../pages/artisian/AddProduct";
 import EditProduct from "../pages/artisian/EditProduct";
+import ArtisanOrders from "../pages/artisian/Orders";
 
 
 function AppRoutes() {
@@ -50,6 +51,10 @@ function AppRoutes() {
             <Route
                 path="/artisan/products/edit/:id"
                 element={<EditProduct />}
+            />
+            <Route
+                path="/artisan/orders"
+                element={<ArtisanOrders />}
             />
         </Routes>
     );

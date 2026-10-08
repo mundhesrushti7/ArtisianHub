@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-const defaultProducts = [
+const demoProducts = [
   {
     id: "1",
     name: "Handmade Clay Pot",
@@ -18,7 +18,7 @@ const defaultProducts = [
     price: 899,
     category: "Jewelry",
     description:
-      "Traditional handmade necklace designed with beautiful handcrafted details.",
+      "A traditional handmade necklace designed with beautiful handcrafted details.",
   },
   {
     id: "3",
@@ -27,7 +27,7 @@ const defaultProducts = [
     price: 1299,
     category: "Paintings",
     description:
-      "A hand-painted canvas created by a skilled local artist.",
+      "A unique hand-painted canvas created by a talented local artist.",
   },
   {
     id: "4",
@@ -36,7 +36,7 @@ const defaultProducts = [
     price: 749,
     category: "Textiles",
     description:
-      "Soft handwoven scarf made using traditional weaving techniques.",
+      "Soft and elegant handwoven scarf made using traditional weaving techniques.",
   },
   {
     id: "5",
@@ -45,7 +45,7 @@ const defaultProducts = [
     price: 799,
     category: "Pottery",
     description:
-      "Elegant terracotta vase handcrafted by traditional artisans.",
+      "Traditional terracotta vase handcrafted by skilled artisans.",
   },
   {
     id: "6",
@@ -54,7 +54,7 @@ const defaultProducts = [
     price: 499,
     category: "Jewelry",
     description:
-      "Beautiful handmade earrings decorated with colorful beads.",
+      "Beautiful handmade earrings featuring colourful handcrafted beads.",
   },
   {
     id: "7",
@@ -63,7 +63,7 @@ const defaultProducts = [
     price: 1599,
     category: "Paintings",
     description:
-      "A beautiful handmade painting inspired by Indian village landscapes.",
+      "A detailed handmade painting inspired by the beauty of rural India.",
   },
   {
     id: "8",
@@ -72,7 +72,7 @@ const defaultProducts = [
     price: 999,
     category: "Textiles",
     description:
-      "Traditional cotton dupatta made using handwoven fabric.",
+      "Traditional cotton dupatta with beautiful handcrafted patterns.",
   },
 ];
 
@@ -80,75 +80,174 @@ function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [stock, setStock] = useState(0);
 
-  const product = useMemo(() => {
+  useEffect(() => {
     const artisanProducts = JSON.parse(
       localStorage.getItem("artisanHubProducts") || "[]"
     );
 
     const allProducts = [
-      ...defaultProducts,
+      ...demoProducts,
       ...artisanProducts,
     ];
 
-    return allProducts.find(
+    const foundProduct = allProducts.find(
       (item) => String(item.id) === String(id)
+    );
+
+    if (!foundProduct) {
+      setProduct(null);
+      return;
+    }
+
+    setProduct(foundProduct);
+
+    /*
+     * Artisan products have actual stock.
+     * Demo products don't, so we give them
+     * a large display stock for the prototype.
+     */
+    setStock(
+      Number(foundProduct.stock ?? 20)
     );
   }, [id]);
 
-  if (!product) {
-    return (
-      <div className="product-not-found">
-        <h2>Product Not Found</h2>
+  const increaseQuantity = () => {
+    if (quantity >= stock) {
+      return;
+    }
 
-        <p>
-          The product you are looking for does not exist.
-        </p>
+    setQuantity((previous) => previous + 1);
+  };
 
-        <button onClick={() => navigate("/products")}>
-          Back to Products
-        </button>
-      </div>
+  const decreaseQuantity = () => {
+    setQuantity((previous) =>
+      Math.max(1, previous - 1)
     );
-  }
+  };
 
-  const total = product.price * quantity;
+  const updateProductStock = (
+    productId,
+    quantityToRemove
+  ) => {
+    const artisanProducts = JSON.parse(
+      localStorage.getItem("artisanHubProducts") || "[]"
+    );
+
+    const updatedProducts =
+      artisanProducts.map((item) => {
+        if (
+          String(item.id) ===
+          String(productId)
+        ) {
+          return {
+            ...item,
+            stock:
+              Number(item.stock || 0) -
+              quantityToRemove,
+          };
+        }
+
+        return item;
+      });
+
+    localStorage.setItem(
+      "artisanHubProducts",
+      JSON.stringify(updatedProducts)
+    );
+  };
 
   const handleAddToCart = () => {
+    if (!product) {
+      return;
+    }
+
+    if (stock <= 0) {
+      alert("This product is out of stock.");
+      return;
+    }
+
+    if (quantity > stock) {
+      alert(
+        `Only ${stock} item${
+          stock === 1 ? "" : "s"
+        } available.`
+      );
+      return;
+    }
+
     const cart = JSON.parse(
       localStorage.getItem("artisanHubCart") || "[]"
     );
 
-    const existingItem = cart.find(
-      (item) => item.id === product.id
-    );
-
-    let updatedCart;
-
-    if (existingItem) {
-      updatedCart = cart.map((item) =>
-        item.id === product.id
-          ? {
-              ...item,
-              quantity: item.quantity + quantity,
-            }
-          : item
+    const existingItemIndex =
+      cart.findIndex(
+        (item) => item.id === product.id
       );
+
+    const existingQuantity =
+      existingItemIndex >= 0
+        ? Number(
+            cart[existingItemIndex].quantity || 0
+          )
+        : 0;
+
+    /*
+     * Important:
+     * Don't allow the cart to contain
+     * more items than available stock.
+     */
+    if (
+      existingQuantity + quantity >
+      stock
+    ) {
+      alert(
+        `Only ${stock} item${
+          stock === 1 ? "" : "s"
+        } available.`
+      );
+      return;
+    }
+
+    if (existingItemIndex >= 0) {
+      cart[existingItemIndex] = {
+        ...cart[existingItemIndex],
+        quantity:
+          existingQuantity + quantity,
+      };
     } else {
-      updatedCart = [
-        ...cart,
-        {
-          ...product,
-          quantity,
-        },
-      ];
+      cart.push({
+        ...product,
+        quantity,
+      });
     }
 
     localStorage.setItem(
       "artisanHubCart",
-      JSON.stringify(updatedCart)
+      JSON.stringify(cart)
     );
+
+    /*
+     * Decrease actual artisan product stock.
+     *
+     * This is done only for products created
+     * by an artisan.
+     */
+    if (product.artisanId) {
+      updateProductStock(
+        product.id,
+        quantity
+      );
+    }
+
+    setStock((previous) =>
+      Math.max(0, previous - quantity)
+    );
+
+    setQuantity(1);
 
     alert("Product added to cart!");
 
@@ -156,11 +255,94 @@ function ProductDetails() {
   };
 
   const handleBuyNow = () => {
-    handleAddToCart();
+    if (!product) {
+      return;
+    }
+
+    if (stock <= 0) {
+      alert("This product is out of stock.");
+      return;
+    }
+
+    /*
+     * Same stock logic as Add to Cart.
+     */
+    const cart = JSON.parse(
+      localStorage.getItem("artisanHubCart") || "[]"
+    );
+
+    const existingItemIndex =
+      cart.findIndex(
+        (item) => item.id === product.id
+      );
+
+    const existingQuantity =
+      existingItemIndex >= 0
+        ? Number(
+            cart[existingItemIndex].quantity || 0
+          )
+        : 0;
+
+    if (
+      existingQuantity + quantity >
+      stock
+    ) {
+      alert(
+        `Only ${stock} item${
+          stock === 1 ? "" : "s"
+        } available.`
+      );
+      return;
+    }
+
+    if (existingItemIndex >= 0) {
+      cart[existingItemIndex] = {
+        ...cart[existingItemIndex],
+        quantity:
+          existingQuantity + quantity,
+      };
+    } else {
+      cart.push({
+        ...product,
+        quantity,
+      });
+    }
+
+    localStorage.setItem(
+      "artisanHubCart",
+      JSON.stringify(cart)
+    );
+
+    if (product.artisanId) {
+      updateProductStock(
+        product.id,
+        quantity
+      );
+    }
+
+    navigate("/checkout");
   };
+
+  if (!product) {
+    return (
+      <div className="product-not-found">
+        <h2>Product Not Found</h2>
+
+        <button
+          onClick={() => navigate("/products")}
+        >
+          ← Back to Products
+        </button>
+      </div>
+    );
+  }
+
+  const total =
+    Number(product.price) * quantity;
 
   return (
     <div className="product-details-page">
+
       <button
         className="product-details-back"
         onClick={() => navigate("/products")}
@@ -168,114 +350,139 @@ function ProductDetails() {
         ← Back to Products
       </button>
 
-      <div className="product-details-container">
+      <div className="product-details-card">
+
+        {/* Product Image */}
+
         <div className="product-details-image">
-          {product.image ? (
-            <img
-              src={product.image}
-              alt={product.name}
-            />
-          ) : (
-            <span>{product.category}</span>
-          )}
+          <span>
+            {product.category}
+          </span>
         </div>
 
-        <div className="product-details-content">
+        {/* Product Information */}
+
+        <div className="product-details-info">
+
           <p className="product-details-category">
             {product.category}
           </p>
 
-          <h1>{product.name}</h1>
+          <h1>
+            {product.name}
+          </h1>
 
           <p className="product-details-artisan">
             Handmade by{" "}
             <strong>
-              {product.artisanName || product.artisan}
+              {product.artisan}
             </strong>
           </p>
 
-          <h2 className="product-details-price">
-            ₹{product.price}
-          </h2>
+          <div className="product-details-price">
+            ₹
+            {Number(
+              product.price
+            ).toLocaleString("en-IN")}
+          </div>
 
           <p className="product-details-description">
-            {product.description ||
-              "A beautiful handmade product created by a talented artisan."}
+            {product.description}
           </p>
 
-          {product.stock !== undefined && (
-            <p className="product-details-stock">
-              {product.stock > 0
-                ? `${product.stock} available`
-                : "Out of stock"}
-            </p>
+          <div
+            className={`product-stock ${
+              stock === 0
+                ? "out-of-stock"
+                : stock <= 3
+                ? "low-stock"
+                : ""
+            }`}
+          >
+            {stock === 0
+              ? "Out of stock"
+              : `${stock} available`}
+          </div>
+
+          {stock > 0 && (
+            <>
+              <div className="product-quantity-section">
+
+                <span>
+                  Quantity
+                </span>
+
+                <div className="quantity-control">
+
+                  <button
+                    type="button"
+                    onClick={
+                      decreaseQuantity
+                    }
+                    disabled={
+                      quantity <= 1
+                    }
+                  >
+                    −
+                  </button>
+
+                  <span>
+                    {quantity}
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={
+                      increaseQuantity
+                    }
+                    disabled={
+                      quantity >= stock
+                    }
+                  >
+                    +
+                  </button>
+
+                </div>
+
+              </div>
+
+              <div className="product-details-total">
+                <span>
+                  Total
+                </span>
+
+                <strong>
+                  ₹
+                  {total.toLocaleString(
+                    "en-IN"
+                  )}
+                </strong>
+              </div>
+
+              <div className="product-details-actions">
+
+                <button
+                  className="product-add-cart-btn"
+                  onClick={
+                    handleAddToCart
+                  }
+                >
+                  Add to Cart
+                </button>
+
+                <button
+                  className="product-buy-now-btn"
+                  onClick={
+                    handleBuyNow
+                  }
+                >
+                  Buy Now
+                </button>
+
+              </div>
+            </>
           )}
 
-          <div className="product-details-quantity">
-            <span>Quantity</span>
-
-            <div>
-              <button
-                onClick={() =>
-                  setQuantity(
-                    Math.max(1, quantity - 1)
-                  )
-                }
-              >
-                −
-              </button>
-
-              <strong>{quantity}</strong>
-
-              <button
-                onClick={() =>
-                  setQuantity(
-                    product.stock
-                      ? Math.min(
-                          product.stock,
-                          quantity + 1
-                        )
-                      : quantity + 1
-                  )
-                }
-                disabled={
-                  product.stock !== undefined &&
-                  product.stock <= quantity
-                }
-              >
-                +
-              </button>
-            </div>
-          </div>
-
-          <div className="product-details-total">
-            <span>Total</span>
-            <strong>₹{total}</strong>
-          </div>
-
-          <div className="product-details-actions">
-            <button
-              className="product-details-cart-btn"
-              onClick={handleAddToCart}
-              disabled={
-                product.stock !== undefined &&
-                product.stock <= 0
-              }
-            >
-              Add to Cart
-            </button>
-
-            <button
-              className="product-details-buy-btn"
-              onClick={handleBuyNow}
-              disabled={
-                product.stock !== undefined &&
-                product.stock <= 0
-              }
-            >
-              Buy Now
-            </button>
-          </div>
         </div>
       </div>
     </div>

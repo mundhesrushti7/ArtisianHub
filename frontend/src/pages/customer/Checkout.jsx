@@ -1,20 +1,16 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Checkout() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const cart = JSON.parse(
-    localStorage.getItem("artisanHubCart") || "[]"
-  );
-
-  const currentUser = JSON.parse(
-    localStorage.getItem("artisanHubCurrentUser") || "null"
-  );
+  const [cart, setCart] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const [formData, setFormData] = useState({
-    name: currentUser?.name || "",
-    email: currentUser?.email || "",
+    name: "",
+    email: "",
     phone: "",
     address: "",
     city: "",
@@ -25,25 +21,54 @@ function Checkout() {
 
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    const storedCart = JSON.parse(
+      localStorage.getItem("artisanHubCart") || "[]"
+    );
+
+    const user = JSON.parse(
+      localStorage.getItem("artisanHubCurrentUser") || "null"
+    );
+
+    if (storedCart.length === 0) {
+      navigate("/cart");
+      return;
+    }
+
+    setCart(storedCart);
+    setCurrentUser(user);
+
+    setFormData((previous) => ({
+      ...previous,
+      name: user?.name || "",
+      email: user?.email || "",
+    }));
+  }, [navigate]);
+
   const subtotal = cart.reduce(
-    (total, item) => total + item.price * item.quantity,
+    (total, item) =>
+      total +
+      Number(item.price || 0) *
+        Number(item.quantity || 0),
     0
   );
 
-  const delivery = cart.length > 0 ? 50 : 0;
+  const delivery = 50;
 
   const total = subtotal + delivery;
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
 
     setError("");
   };
 
-  const handlePlaceOrder = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     if (
@@ -55,37 +80,32 @@ function Checkout() {
       !formData.state.trim() ||
       !formData.pincode.trim()
     ) {
-      setError("Please fill in all delivery details.");
+      setError("Please fill in all required fields.");
       return;
     }
 
-    // Email validation
     const emailRegex =
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailRegex.test(formData.email)) {
+    if (!emailRegex.test(formData.email.trim())) {
       setError("Please enter a valid email address.");
       return;
     }
 
-    // Phone validation
-    // Allows exactly 10 digits
     const phoneRegex = /^\d{10}$/;
 
     if (!phoneRegex.test(formData.phone)) {
       setError(
-        "Please enter a valid 10-digit phone number."
+        "Phone number must contain exactly 10 digits."
       );
       return;
     }
 
-    // Pincode validation
-    // Indian pincode = exactly 6 digits
     const pincodeRegex = /^\d{6}$/;
 
     if (!pincodeRegex.test(formData.pincode)) {
       setError(
-        "Please enter a valid 6-digit pincode."
+        "Pincode must contain exactly 6 digits."
       );
       return;
     }
@@ -95,11 +115,22 @@ function Checkout() {
       return;
     }
 
-    const existingOrders = JSON.parse(
-      localStorage.getItem("artisanHubOrders") || "[]"
-    );
+    /*
+     * Collect all artisans whose products
+     * are present in this order.
+     */
+    const artisanIds = [
+      ...new Set(
+        cart
+          .map((item) => item.artisanId)
+          .filter(Boolean)
+      ),
+    ];
 
-    const newOrder = {
+    /*
+     * Create the order.
+     */
+    const order = {
       id: `AH-${Date.now()}`,
 
       userId: currentUser?.id || null,
@@ -117,7 +148,15 @@ function Checkout() {
         pincode: formData.pincode,
       },
 
+      /*
+       * Products purchased in this order.
+       */
       items: cart,
+
+      /*
+       * IDs of artisans involved in the order.
+       */
+      artisanIds,
 
       subtotal,
 
@@ -125,63 +164,233 @@ function Checkout() {
 
       total,
 
-      paymentMethod: formData.paymentMethod,
+      paymentMethod:
+        formData.paymentMethod,
 
       status: "Order Placed",
 
       createdAt: new Date().toISOString(),
     };
 
-    existingOrders.push(newOrder);
+    /*
+     * Get existing orders.
+     */
+    const existingOrders = JSON.parse(
+      localStorage.getItem("artisanHubOrders") ||
+        "[]"
+    );
+
+    /*
+     * Add new order.
+     */
+    const updatedOrders = [
+      ...existingOrders,
+      order,
+    ];
 
     localStorage.setItem(
       "artisanHubOrders",
-      JSON.stringify(existingOrders)
+      JSON.stringify(updatedOrders)
     );
 
+    /*
+     * Empty cart after successful order.
+     */
     localStorage.removeItem("artisanHubCart");
 
+    /*
+     * Go to order success page.
+     */
     navigate("/order-success", {
       state: {
-        order: newOrder,
+        order,
       },
     });
   };
 
   if (cart.length === 0) {
-    return (
-      <main className="checkout-page">
-        <div className="checkout-empty">
-          <h1>Your Cart is Empty</h1>
-
-          <p>
-            Add some products before proceeding to checkout.
-          </p>
-
-          <button
-            onClick={() => navigate("/products")}
-          >
-            Explore Products
-          </button>
-        </div>
-      </main>
-    );
+    return null;
   }
 
   return (
-    <main className="checkout-page">
+    <div className="checkout-page">
       <div className="checkout-header">
-        <p>ARTISANHUB CHECKOUT</p>
-
         <h1>Checkout</h1>
+
+        <p>
+          Complete your details to place your order.
+        </p>
       </div>
 
-      <section className="checkout-container">
+      <div className="checkout-container">
         <form
           className="checkout-form"
-          onSubmit={handlePlaceOrder}
+          onSubmit={handleSubmit}
         >
-          <h2>Delivery Information</h2>
+          <div className="checkout-section">
+            <h2>Contact Information</h2>
+
+            <div className="checkout-form-grid">
+              <div className="checkout-field">
+                <label>
+                  Full Name *
+                </label>
+
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Enter your name"
+                />
+              </div>
+
+              <div className="checkout-field">
+                <label>
+                  Email *
+                </label>
+
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Enter your email"
+                />
+              </div>
+
+              <div className="checkout-field">
+                <label>
+                  Phone *
+                </label>
+
+                <input
+                  type="text"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="10-digit phone number"
+                  maxLength="10"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="checkout-section">
+            <h2>Delivery Address</h2>
+
+            <div className="checkout-form-grid">
+              <div className="checkout-field checkout-full">
+                <label>
+                  Address *
+                </label>
+
+                <textarea
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  placeholder="House number, street, area"
+                  rows="3"
+                />
+              </div>
+
+              <div className="checkout-field">
+                <label>
+                  City *
+                </label>
+
+                <input
+                  type="text"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  placeholder="City"
+                />
+              </div>
+
+              <div className="checkout-field">
+                <label>
+                  State *
+                </label>
+
+                <input
+                  type="text"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleChange}
+                  placeholder="State"
+                />
+              </div>
+
+              <div className="checkout-field">
+                <label>
+                  Pincode *
+                </label>
+
+                <input
+                  type="text"
+                  name="pincode"
+                  value={formData.pincode}
+                  onChange={handleChange}
+                  placeholder="6-digit pincode"
+                  maxLength="6"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="checkout-section">
+            <h2>Payment Method</h2>
+
+            <div className="checkout-payment-options">
+              <label className="checkout-payment-option">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="cod"
+                  checked={
+                    formData.paymentMethod ===
+                    "cod"
+                  }
+                  onChange={handleChange}
+                />
+
+                <div>
+                  <strong>
+                    Cash on Delivery
+                  </strong>
+
+                  <span>
+                    Pay when your order arrives.
+                  </span>
+                </div>
+              </label>
+
+              <label className="checkout-payment-option">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="online"
+                  checked={
+                    formData.paymentMethod ===
+                    "online"
+                  }
+                  onChange={handleChange}
+                />
+
+                <div>
+                  <strong>
+                    Online Payment
+                  </strong>
+
+                  <span>
+                    Payment gateway integration
+                    can be added later.
+                  </span>
+                </div>
+              </label>
+            </div>
+          </div>
 
           {error && (
             <div className="checkout-error">
@@ -189,189 +398,70 @@ function Checkout() {
             </div>
           )}
 
-          <div className="checkout-row">
-            <div>
-              <label>Full Name</label>
-
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Enter your full name"
-              />
-            </div>
-
-            <div>
-              <label>Email</label>
-
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Enter your email"
-              />
-            </div>
-          </div>
-
-          <label>Phone Number</label>
-
-          <input
-            type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder="10-digit phone number"
-            maxLength="10"
-          />
-
-          <label>Address</label>
-
-          <textarea
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            placeholder="House no., street, area"
-            rows="4"
-          ></textarea>
-
-          <div className="checkout-row">
-            <div>
-              <label>City</label>
-
-              <input
-                type="text"
-                name="city"
-                value={formData.city}
-                onChange={handleChange}
-                placeholder="Mumbai"
-              />
-            </div>
-
-            <div>
-              <label>State</label>
-
-              <input
-                type="text"
-                name="state"
-                value={formData.state}
-                onChange={handleChange}
-                placeholder="Maharashtra"
-              />
-            </div>
-          </div>
-
-          <label>Pincode</label>
-
-          <input
-            type="text"
-            name="pincode"
-            value={formData.pincode}
-            onChange={handleChange}
-            placeholder="6-digit pincode"
-            maxLength="6"
-          />
-
-          <h2 className="payment-heading">
-            Payment Method
-          </h2>
-
-          <div className="payment-options">
-            <label className="payment-option">
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="cod"
-                checked={
-                  formData.paymentMethod === "cod"
-                }
-                onChange={handleChange}
-              />
-
-              <div>
-                <strong>Cash on Delivery</strong>
-
-                <span>
-                  Pay when your order arrives.
-                </span>
-              </div>
-            </label>
-
-            <label className="payment-option">
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="online"
-                checked={
-                  formData.paymentMethod === "online"
-                }
-                onChange={handleChange}
-              />
-
-              <div>
-                <strong>Online Payment</strong>
-
-                <span>
-                  Payment gateway will be integrated later.
-                </span>
-              </div>
-            </label>
-          </div>
-
           <button
             type="submit"
-            className="place-order-button"
+            className="checkout-place-order-btn"
           >
-            Place Order • ₹{total}
+            Place Order
           </button>
         </form>
 
-        <aside className="checkout-summary">
+        <div className="checkout-summary">
           <h2>Order Summary</h2>
 
-          <div className="checkout-items">
+          <div className="checkout-summary-items">
             {cart.map((item) => (
               <div
-                className="checkout-item"
+                className="checkout-summary-item"
                 key={item.id}
               >
                 <div>
-                  <strong>{item.name}</strong>
+                  <strong>
+                    {item.name}
+                  </strong>
 
                   <span>
-                    Qty: {item.quantity}
+                    × {item.quantity}
                   </span>
                 </div>
 
-                <span>
-                  ₹{item.price * item.quantity}
-                </span>
+                <strong>
+                  ₹
+                  {(
+                    Number(item.price) *
+                    Number(item.quantity)
+                  ).toLocaleString("en-IN")}
+                </strong>
               </div>
             ))}
           </div>
 
-          <hr />
-
-          <div>
+          <div className="checkout-summary-line">
             <span>Subtotal</span>
-            <span>₹{subtotal}</span>
+
+            <strong>
+              ₹{subtotal.toLocaleString("en-IN")}
+            </strong>
           </div>
 
-          <div>
+          <div className="checkout-summary-line">
             <span>Delivery</span>
-            <span>₹{delivery}</span>
+
+            <strong>
+              ₹{delivery}
+            </strong>
           </div>
 
-          <hr />
+          <div className="checkout-summary-total">
+            <span>Total</span>
 
-          <div className="checkout-total">
-            <strong>Total</strong>
-            <strong>₹{total}</strong>
+            <strong>
+              ₹{total.toLocaleString("en-IN")}
+            </strong>
           </div>
-        </aside>
-      </section>
-    </main>
+        </div>
+      </div>
+    </div>
   );
 }
 
