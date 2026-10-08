@@ -10,12 +10,19 @@ function Navbar() {
     0
   );
 
+  const currentUser = JSON.parse(
+    localStorage.getItem("artisanHubCurrentUser") ||
+      "null"
+  );
+
   return (
     <nav>
       <h2>ArtisanHub</h2>
 
       <div>
-        <Link to="/">Home</Link>
+        <Link to="/">
+          Home
+        </Link>
 
         <Link to="/products">
           Products
@@ -30,13 +37,21 @@ function Navbar() {
           )}
         </Link>
 
-        <Link to="/login">
-          Login
-        </Link>
+        {currentUser ? (
+          <span className="navbar-user">
+            Hi, {currentUser.name}
+          </span>
+        ) : (
+          <>
+            <Link to="/login">
+              Login
+            </Link>
 
-        <Link to="/register">
-          Register
-        </Link>
+            <Link to="/register">
+              Register
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   );
