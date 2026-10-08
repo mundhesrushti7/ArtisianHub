@@ -11,28 +11,48 @@ import OrderSuccess from "../pages/customer/OrderSuccess";
 import Orders from "../pages/customer/Orders";
 
 import ArtisanDashboard from "../pages/artisian/ArtisanDashboard";
+import ArtisanProducts from "../pages/artisian/Products";
+import AddProduct from "../pages/artisian/AddProduct";
+import EditProduct from "../pages/artisian/EditProduct";
+
 
 function AppRoutes() {
-  return (
-    <Routes>
-      {/* Customer Routes */}
-      <Route path="/" element={<Home />} />
-      <Route path="/products" element={<Products />} />
-      <Route path="/product/:id" element={<ProductDetails />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/checkout" element={<Checkout />} />
-      <Route path="/order-success" element={<OrderSuccess />} />
-      <Route path="/orders" element={<Orders />} />
+    return (
+        <Routes>
+            {/* Customer Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/order-success" element={<OrderSuccess />} />
+            <Route path="/orders" element={<Orders />} />
 
-      {/* Artisan / Seller Routes */}
-      <Route
-        path="/artisan/dashboard"
-        element={<ArtisanDashboard />}
-      />
-    </Routes>
-  );
+            {/* Artisan / Seller Routes */}
+            <Route
+                path="/artisan/dashboard"
+                element={<ArtisanDashboard />}
+            />
+
+            <Route
+                path="/artisan/products"
+                element={<ArtisanProducts />}
+            />
+
+
+            <Route
+                path="/artisan/products/add"
+                element={<AddProduct />}
+            />
+
+            <Route
+                path="/artisan/products/edit/:id"
+                element={<EditProduct />}
+            />
+        </Routes>
+    );
 }
 
 export default AppRoutes;
