@@ -6,6 +6,8 @@ import ProductDetails from "../pages/customer/ProductDetails";
 import Cart from "../pages/customer/Cart";
 import Login from "../pages/customer/Login";
 import Register from "../pages/customer/Register";
+import Checkout from "../pages/customer/Checkout";
+import OrderSuccess from "../pages/customer/OrderSuccess";
 
 function AppRoutes() {
   return (
@@ -35,6 +37,16 @@ function AppRoutes() {
       <Route
         path="/register"
         element={<Register />}
+      />
+
+      <Route
+        path="/checkout"
+        element={<Checkout />}
+      />
+
+      <Route
+        path="/order-success"
+        element={<OrderSuccess />}
       />
     </Routes>
   );
