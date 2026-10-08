@@ -1,254 +1,253 @@
-import { useEffect, useMemo, useState } from "react";
-import ProductCard from "../../components/ProductCard";
-
-const defaultProducts = [
-  {
-    id: "1",
-    name: "Handmade Clay Pot",
-    artisan: "Priya Arts",
-    price: 599,
-    category: "Pottery",
-    description:
-      "Beautiful handmade clay pot crafted using traditional pottery techniques.",
-  },
-  {
-    id: "2",
-    name: "Traditional Necklace",
-    artisan: "Crafts by Riya",
-    price: 899,
-    category: "Jewelry",
-    description:
-      "Traditional handmade necklace designed with beautiful handcrafted details.",
-  },
-  {
-    id: "3",
-    name: "Hand Painted Canvas",
-    artisan: "Art by Meera",
-    price: 1299,
-    category: "Paintings",
-    description:
-      "A hand-painted canvas created by a skilled local artist.",
-  },
-  {
-    id: "4",
-    name: "Handwoven Scarf",
-    artisan: "Kala Crafts",
-    price: 749,
-    category: "Textiles",
-    description:
-      "Soft handwoven scarf made using traditional weaving techniques.",
-  },
-  {
-    id: "5",
-    name: "Terracotta Vase",
-    artisan: "Mitti Studio",
-    price: 799,
-    category: "Pottery",
-    description:
-      "Elegant terracotta vase handcrafted by traditional artisans.",
-  },
-  {
-    id: "6",
-    name: "Beaded Handmade Earrings",
-    artisan: "Riya Handcrafts",
-    price: 499,
-    category: "Jewelry",
-    description:
-      "Beautiful handmade earrings decorated with colorful beads.",
-  },
-  {
-    id: "7",
-    name: "Village Landscape Painting",
-    artisan: "Meera Creations",
-    price: 1599,
-    category: "Paintings",
-    description:
-      "A beautiful handmade painting inspired by Indian village landscapes.",
-  },
-  {
-    id: "8",
-    name: "Traditional Cotton Dupatta",
-    artisan: "Kala Weaves",
-    price: 999,
-    category: "Textiles",
-    description:
-      "Traditional cotton dupatta made using handwoven fabric.",
-  },
-];
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Products() {
-  const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] =
-    useState("All");
+  const navigate = useNavigate();
 
-  const [artisanProducts, setArtisanProducts] =
-    useState([]);
+  const [products, setProducts] = useState([]);
+  const [currentUser, setCurrentUser] =
+    useState(null);
 
   useEffect(() => {
-    const loadProducts = () => {
-      try {
-        const storedProducts = JSON.parse(
-          localStorage.getItem("artisanHubProducts") || "[]"
-        );
-
-        const formattedProducts = storedProducts.map(
-          (product) => ({
-            ...product,
-            artisan:
-              product.artisanName ||
-              product.artisan ||
-              "Artisan Seller",
-          })
-        );
-
-        setArtisanProducts(formattedProducts);
-      } catch (error) {
-        console.error(
-          "Error loading artisan products:",
-          error
-        );
-
-        setArtisanProducts([]);
-      }
-    };
-
-    loadProducts();
-
-    window.addEventListener(
-      "storage",
-      loadProducts
+    const user = JSON.parse(
+      localStorage.getItem(
+        "artisanHubCurrentUser"
+      ) || "null"
     );
 
-    window.addEventListener(
-      "artisanProductsUpdated",
-      loadProducts
-    );
-
-    return () => {
-      window.removeEventListener(
-        "storage",
-        loadProducts
-      );
-
-      window.removeEventListener(
-        "artisanProductsUpdated",
-        loadProducts
-      );
-    };
-  }, []);
-
-  const allProducts = useMemo(() => {
-    return [
-      ...defaultProducts,
-      ...artisanProducts,
-    ];
-  }, [artisanProducts]);
-
-  const categories = [
-    "All",
-    "Pottery",
-    "Jewelry",
-    "Paintings",
-    "Textiles",
-    "Woodwork",
-    "Handicrafts",
-    "Other",
-  ];
-
-  const filteredProducts = allProducts.filter(
-    (product) => {
-      const searchValue = search
-        .toLowerCase()
-        .trim();
-
-      const matchesSearch =
-        product.name
-          .toLowerCase()
-          .includes(searchValue) ||
-        String(product.artisan || "")
-          .toLowerCase()
-          .includes(searchValue) ||
-        product.category
-          .toLowerCase()
-          .includes(searchValue);
-
-      const matchesCategory =
-        selectedCategory === "All" ||
-        product.category === selectedCategory;
-
-      return (
-        matchesSearch &&
-        matchesCategory
-      );
+    if (!user) {
+      navigate("/login");
+      return;
     }
-  );
+
+    if (user.role !== "artisan") {
+      navigate("/");
+      return;
+    }
+
+    setCurrentUser(user);
+
+    loadProducts(user);
+  }, [navigate]);
+
+  const loadProducts = (user) => {
+    const allProducts = JSON.parse(
+      localStorage.getItem(
+        "artisanHubProducts"
+      ) || "[]"
+    );
+
+    const artisanProducts =
+      allProducts.filter(
+        (product) =>
+          String(product.artisanId) ===
+          String(user.id)
+      );
+
+    setProducts(artisanProducts);
+  };
+
+  const handleDelete = (productId) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this product?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const allProducts = JSON.parse(
+      localStorage.getItem(
+        "artisanHubProducts"
+      ) || "[]"
+    );
+
+    const updatedProducts =
+      allProducts.filter(
+        (product) =>
+          !(
+            String(product.id) ===
+              String(productId) &&
+            String(product.artisanId) ===
+              String(currentUser?.id)
+          )
+      );
+
+    localStorage.setItem(
+      "artisanHubProducts",
+      JSON.stringify(updatedProducts)
+    );
+
+    const artisanProducts =
+      updatedProducts.filter(
+        (product) =>
+          String(product.artisanId) ===
+          String(currentUser?.id)
+      );
+
+    setProducts(artisanProducts);
+  };
 
   return (
-    <div className="products-page">
-      <div className="products-header">
-        <h1>Explore Handmade Products</h1>
+    <div className="artisan-products-page">
 
-        <p>
-          Discover unique products created by talented
-          artisans.
-        </p>
-      </div>
+      <div className="artisan-products-header">
 
-      <div className="products-controls">
-        <input
-          type="text"
-          placeholder="Search products, artisans or categories..."
-          value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
-        />
+        <div>
+          <p className="artisan-section-label">
+            Artisan / Seller
+          </p>
 
-        <div className="category-filters">
-          {categories.map((category) => (
-            <button
-              key={category}
-              className={
-                selectedCategory === category
-                  ? "active"
-                  : ""
-              }
-              onClick={() =>
-                setSelectedCategory(category)
-              }
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      </div>
+          <h1>My Products</h1>
 
-      <div className="products-result-count">
-        Showing {filteredProducts.length} product
-        {filteredProducts.length !== 1
-          ? "s"
-          : ""}
-      </div>
-
-      {filteredProducts.length === 0 ? (
-        <div className="products-empty">
-          <h2>No products found</h2>
-
-          <p>
-            Try changing your search or category
-            filter.
+          <p className="artisan-products-subtitle">
+            Manage the handmade products you
+            are selling on ArtisanHub.
           </p>
         </div>
+
+        <div className="artisan-products-header-actions">
+
+          <button
+            className="artisan-secondary-btn"
+            onClick={() =>
+              navigate(
+                "/artisan/dashboard"
+              )
+            }
+          >
+            ← Dashboard
+          </button>
+
+          <button
+            className="artisan-primary-btn"
+            onClick={() =>
+              navigate(
+                "/artisan/products/add"
+              )
+            }
+          >
+            + Add Product
+          </button>
+
+        </div>
+
+      </div>
+
+      <div className="artisan-products-count">
+        {products.length}{" "}
+        {products.length === 1
+          ? "product"
+          : "products"}{" "}
+        listed
+      </div>
+
+      {products.length === 0 ? (
+        <div className="artisan-empty-products">
+
+          <div className="artisan-empty-icon">
+            📦
+          </div>
+
+          <h2>No Products Yet</h2>
+
+          <p>
+            You haven't added any products
+            to your store yet.
+          </p>
+
+          <button
+            className="artisan-primary-btn"
+            onClick={() =>
+              navigate(
+                "/artisan/products/add"
+              )
+            }
+          >
+            + Add Your First Product
+          </button>
+
+        </div>
       ) : (
-        <div className="products-grid">
-          {filteredProducts.map((product) => (
-            <ProductCard
+        <div className="artisan-products-grid">
+
+          {products.map((product) => (
+            <div
+              className="artisan-product-card"
               key={product.id}
-              product={product}
-            />
+            >
+
+              <div className="artisan-product-image">
+                <span>
+                  {product.category}
+                </span>
+              </div>
+
+              <div className="artisan-product-content">
+
+                <p className="artisan-product-category">
+                  {product.category}
+                </p>
+
+                <h2>
+                  {product.name}
+                </h2>
+
+                <p className="artisan-product-description">
+                  {product.description ||
+                    "Handmade product created by our artisan."}
+                </p>
+
+                <div className="artisan-product-info">
+
+                  <div>
+                    <span>Price</span>
+                    <strong>
+                      ₹{product.price}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>Stock</span>
+                    <strong>
+                      {product.stock}
+                    </strong>
+                  </div>
+
+                </div>
+
+                <div className="artisan-product-actions">
+
+                  <button
+                    className="artisan-edit-btn"
+                    onClick={() =>
+                      navigate(
+                        `/artisan/products/edit/${product.id}`
+                      )
+                    }
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    className="artisan-delete-btn"
+                    onClick={() =>
+                      handleDelete(product.id)
+                    }
+                  >
+                    Delete
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
           ))}
+
         </div>
       )}
+
     </div>
   );
 }
