@@ -13,8 +13,8 @@ import Orders from "../pages/customer/Orders";
 import ArtisanDashboard from "../pages/artisian/ArtisanDashboard";
 import ArtisanProducts from "../pages/artisian/Products";
 import AddProduct from "../pages/artisian/AddProduct";
-import EditProduct from "../pages/artisian/EditProduct";
 import ArtisanOrders from "../pages/artisian/Orders";
+import EditProduct from "../pages/artisian/products/edit/EditProduct";
 
 
 function AppRoutes() {
@@ -30,6 +30,7 @@ function AppRoutes() {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order-success" element={<OrderSuccess />} />
             <Route path="/orders" element={<Orders />} />
+
 
             {/* Artisan / Seller Routes */}
             <Route
@@ -55,6 +56,10 @@ function AppRoutes() {
             <Route
                 path="/artisan/orders"
                 element={<ArtisanOrders />}
+            />
+            <Route
+                path="/artisan/products/edit/:id"
+                element={<EditProduct />}
             />
         </Routes>
     );

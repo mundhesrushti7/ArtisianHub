@@ -4171,3 +4171,251 @@ nav a:hover {
     justify-content: flex-start;
   }
 }
+
+/* =========================================================
+   ARTISAN EDIT PRODUCT
+   ========================================================= */
+
+.artisan-edit-product-page {
+  min-height: calc(100vh - 80px);
+  padding: 45px 6%;
+  background: #f8f3ed;
+}
+
+.artisan-edit-product-header {
+  max-width: 850px;
+  margin: 0 auto 30px;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.artisan-edit-product-header p {
+  margin: 0 0 6px;
+
+  color: #a0663c;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.artisan-edit-product-header h1 {
+  margin: 0 0 7px;
+
+  color: #3f2a1d;
+
+  font-size: 34px;
+}
+
+.artisan-edit-product-header span {
+  color: #75685f;
+
+  font-size: 14px;
+}
+
+.artisan-secondary-btn {
+  padding: 11px 17px;
+
+  border: 1px solid #d8c8bb;
+  border-radius: 7px;
+
+  background: white;
+  color: #6d452b;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.artisan-secondary-btn:hover {
+  background: #f3e5d8;
+}
+
+.artisan-edit-product-form {
+  max-width: 850px;
+  margin: 0 auto;
+
+  padding: 32px;
+
+  background: white;
+
+  border: 1px solid #eadfd4;
+  border-radius: 12px;
+
+  box-shadow: 0 4px 15px rgba(70, 45, 30, 0.06);
+}
+
+.artisan-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  margin-bottom: 22px;
+}
+
+.artisan-form-field label {
+  color: #3f2a1d;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.artisan-form-field input,
+.artisan-form-field select,
+.artisan-form-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 12px 14px;
+
+  border: 1px solid #d8c8bb;
+  border-radius: 7px;
+
+  background: white;
+  color: #3f2a1d;
+
+  font-size: 14px;
+
+  outline: none;
+}
+
+.artisan-form-field input:focus,
+.artisan-form-field select:focus,
+.artisan-form-field textarea:focus {
+  border-color: #9a6b43;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(154, 107, 67, 0.1);
+}
+
+.artisan-form-field textarea {
+  resize: vertical;
+}
+
+.artisan-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.artisan-form-row .artisan-form-field {
+  margin-bottom: 22px;
+}
+
+.artisan-form-error {
+  margin-bottom: 20px;
+  padding: 12px 15px;
+
+  border: 1px solid #e4b9b5;
+  border-radius: 7px;
+
+  background: #fff0ef;
+  color: #9a3f39;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.artisan-edit-product-actions {
+  padding-top: 10px;
+
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+
+  border-top: 1px solid #eee5dd;
+}
+
+.artisan-cancel-btn,
+.artisan-save-product-btn {
+  padding: 12px 22px;
+
+  border-radius: 7px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.artisan-cancel-btn {
+  border: 1px solid #d8c8bb;
+
+  background: white;
+  color: #6d452b;
+}
+
+.artisan-save-product-btn {
+  border: 1px solid #7a4b2a;
+
+  background: #7a4b2a;
+  color: white;
+}
+
+.artisan-save-product-btn:hover {
+  background: #633b21;
+}
+
+.artisan-edit-error-page {
+  min-height: calc(100vh - 80px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+
+  background: #f8f3ed;
+}
+
+.artisan-edit-error-page h2 {
+  color: #3f2a1d;
+}
+
+.artisan-edit-error-page button {
+  padding: 11px 18px;
+
+  border: none;
+  border-radius: 7px;
+
+  background: #7a4b2a;
+  color: white;
+
+  cursor: pointer;
+}
+
+@media (max-width: 650px) {
+  .artisan-edit-product-page {
+    padding: 30px 20px;
+  }
+
+  .artisan-edit-product-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .artisan-form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .artisan-edit-product-form {
+    padding: 22px;
+  }
+
+  .artisan-edit-product-actions {
+    flex-direction: column-reverse;
+  }
+
+  .artisan-cancel-btn,
+  .artisan-save-product-btn {
+    width: 100%;
+  }
+}
