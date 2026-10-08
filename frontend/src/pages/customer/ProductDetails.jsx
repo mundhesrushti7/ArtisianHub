@@ -110,12 +110,38 @@ function ProductDetails() {
     }
   };
 
-  const totalPrice = product.price * quantity;
-
   const handleAddToCart = () => {
-    alert(
-      `${product.name} (${quantity}) added to cart!`
+    const savedCart = localStorage.getItem("artisanHubCart");
+
+    const cart = savedCart
+      ? JSON.parse(savedCart)
+      : [];
+
+    const existingItem = cart.find(
+      (item) => item.id === product.id
     );
+
+    if (existingItem) {
+      existingItem.quantity += quantity;
+    } else {
+      cart.push({
+        ...product,
+        quantity,
+      });
+    }
+
+    localStorage.setItem(
+      "artisanHubCart",
+      JSON.stringify(cart)
+    );
+
+    alert(`${product.name} added to cart!`);
+
+    navigate("/cart");
+  };
+
+  const handleBuyNow = () => {
+    handleAddToCart();
   };
 
   return (
@@ -169,11 +195,6 @@ function ProductDetails() {
             </div>
           </div>
 
-          <div className="product-total">
-            <span>Total</span>
-            <strong>₹{totalPrice}</strong>
-          </div>
-
           <div className="product-actions">
             <button
               className="add-cart-button"
@@ -184,7 +205,7 @@ function ProductDetails() {
 
             <button
               className="buy-now-button"
-              onClick={() => alert("Buy Now feature coming next!")}
+              onClick={handleBuyNow}
             >
               Buy Now
             </button>
